@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A Bloomscroll task</title>
+<style>
+  :root { --bg:#FAFCEF; --ink:#22402C; --muted:#6B7A64; --line:#DCE5CC; --accent:#2F8F4E; --on:#fff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: Georgia, 'Times New Roman', serif; line-height: 1.5; }
+  main { max-width: 440px; margin: 0 auto; padding: 48px 16px 64px; }
+  .from { color: var(--muted); margin: 0 0 16px; }
+  .card { background: var(--accent); color: var(--on); border-radius: 18px; padding: 28px 22px 32px; min-height: 220px;
+          display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+  .cat { font-family: system-ui, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+  .task { font-size: 1.6rem; line-height: 1.25; margin: 0; }
+  .open { display: block; margin-top: 20px; text-align: center; background: var(--ink); color: #fff; text-decoration: none;
+          font-family: system-ui, sans-serif; font-weight: 600; font-size: 1.05rem; padding: 14px 16px; border-radius: 10px; min-height: 48px; }
+  .note { color: var(--muted); font-size: .9rem; margin-top: 18px; text-align: center; }
+  .missing { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <p class="from">A friend sent you a Bloomscroll task.</p>
+  <div class="card" id="card" hidden>
+    <span class="cat" id="cat"></span>
+    <p class="task" id="task"></p>
+  </div>
+  <p class="missing" id="missing" hidden>This link is missing its task.</p>
+  <a class="open" id="open" href="#" hidden>Open in Bloomscroll</a>
+  <p class="note">Bloomscroll is not in the app stores yet.</p>
+</main>
+<script>
+  // The task travels after the # (built by the app's data/taskLink.ts), so it never reaches this site's server.
+  var COLORS = { move: ["Move", "#2F8F4E", "#fff"], mind: ["Mind", "#3B7BC8", "#fff"], calm: ["Calm", "#8A6CC4", "#fff"],
+                 connect: ["Connect", "#D96E54", "#fff"], make: ["Make", "#D9A521", "#22402C"] };
+  var p = {};
+  location.hash.slice(1).split("&").forEach(function (part) {
+    var i = part.indexOf("=");
+    if (i > 0) { try { p[part.slice(0, i)] = decodeURIComponent(part.slice(i + 1)); } catch (e) {} }
+  });
+  var c = COLORS[p.c], t = (p.t || "").trim().slice(0, 120);
+  if (c && t) {
+    document.getElementById("cat").textContent = c[0];
+    document.getElementById("task").textContent = t;
+    var card = document.getElementById("card");
+    card.style.setProperty("--accent", c[1]); card.style.setProperty("--on", c[2]); card.hidden = false;
+    var open = document.getElementById("open");
+    open.href = "bloomscroll://task?c=" + encodeURIComponent(p.c) + "&t=" + encodeURIComponent(t);
+    open.hidden = false;
+    document.title = t + " | Bloomscroll";
+  } else {
+    document.getElementById("missing").hidden = false;
+  }
+</script>
+</body>
+</html>
